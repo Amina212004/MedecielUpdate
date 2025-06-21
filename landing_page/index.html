@@ -4,28 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medeciel</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Inter&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   <header class="navbar">
     <div class="logo">
-      <img src="logo.png" alt="logo" />
+      <a href="#home">
+        <img src="logo.png" alt="logo" />
+      </a>
     </div>
     <nav>
+      <div class="hamburger">
+        <i class="fas fa-bars"></i>
+      </div>
       <ul class="nav-links">
-        <li><a href="#">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
     <div class="auth-buttons">
-      <a href="#" class="login">Login</a>
-      <a href="#" class="signup">Sign up</a>
+      <a href="https://medeciel.netlify.app/login" class="login">Login</a>
+      <a href="https://medeciel.netlify.app/signup" class="signup">Sign up</a>
     </div>
   </header>
 
-  <section class="hero">
+  <section class="hero reveal" id="home">
     <div class="hero-text">
       <h1>ESI Clinic Portal</h1>
       <p>
@@ -36,8 +43,7 @@
     </div>
   </section>
 
-  <!--About page-->
-  <section class="about-section">
+  <section class="about-section reveal" id="about">
     <div class="container">
       <div class="about-image">
         <img src="about-img.png" alt="About Us">
@@ -45,16 +51,64 @@
       <div class="about-content">
         <h2>About Us</h2>
         <p>
-          We are passionate about delivering high-quality products that meet your needs. 
-          Our dedicated team works tirelessly to ensure customer satisfaction and continuous innovation.
+          The ESI Medical Clinic provides healthcare services
+          to students and staff of the Higher School of Computer Science of Sidi Bel Abbès.
         </p>
         <p>
-          With years of experience, we believe in building lasting relationships and pushing the boundaries of excellence.
+          Our mission is to support academic success by promoting physical and mental well-being through accessible, confidential, and professional medical care.
+          We offer general consultations and preventive care tailored to the needs of the university community.
         </p>
-        <a href="#learn-more" class="btn">Learn More</a>
       </div>
     </div>
   </section>
 
+  <section class="contact reveal" id="contact">
+    <div class="container">
+      <div class="row">
+        <div class="contact-left">
+          <h1 class="sub-title">Contact Us</h1>
+          <p><i class="fas fa-paper-plane"></i>assistant@esi-sba.dz</p>
+          <p><i class="fas fa-phone-square-alt"></i>0123456789</p>
+        </div>
+      </div>
+      <div class="contact-right">
+        <form>
+          <input type="text" name="Name" placeholder="Your Name" required/>
+          <input type="email" name="email" placeholder="Your Email" required/>
+          <textarea name="Message" rows="6" placeholder="Your Message"></textarea>
+          <button type="submit" class="btn btn2">Submit</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <footer class="copyright">
+      <p>&copy; 2025 Medeciel. Made with <i class="fas fa-heart"></i></p>
+  </footer>
+
+  <script>
+    function revealOnScroll() {
+      const reveals = document.querySelectorAll('.reveal');
+      reveals.forEach((section) => {
+        const windowHeight = window.innerHeight;
+        const sectionTop = section.getBoundingClientRect().top;
+        const revealPoint = 100;
+        if (sectionTop < windowHeight - revealPoint) {
+          section.classList.add('active');
+        } else {
+          section.classList.remove('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('load', revealOnScroll);
+
+    
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+  </script>
 </body>
 </html>
