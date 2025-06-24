@@ -2,8 +2,22 @@
 import backgroundImage from '../assets/ResetPassword1.png';
 import { MdEmail } from "react-icons/md";
 import logo from "../assets/LOgo.svg";
+import { useNavigate } from "react-router-dom";
+  import { useState } from 'react';
 
 const ForgotPassword = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [isValid, setIsValid] = useState(false);
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+
+    // Regex qui vérifie l'email selon ta règle
+    const emailPattern = /^[a-zA-Z]{1,3}\.[a-zA-Z]+@esi-sba\.dz$/;
+
+    setIsValid(emailPattern.test(value));
+  };
   return (
     <div
       className="min-h-screen w-full bg-cover bg-center relative"
@@ -38,13 +52,32 @@ const ForgotPassword = () => {
   <input
     type="email"
     id="email"
+    value={email}
+    onChange={handleEmailChange}
     placeholder="Enter your email"
     className="w-3/4  px-5 py-3 rounded-lg text-[#002C4E] text-[18px] font-medium focus:outline-none focus:ring-2 focus:ring-teal-300 h-16 placeholder:text-[20px]"
-  />
+  /> 
+    {email.length > 0 && !isValid && (
+        <p className="text-red-500 text-sm">Veuillez respecter le format : abc.prenom@esi-sba.dz</p>
+      )}
 
   {/* Button aligné en bas */}
-  <div className="mt-auto">
-    <button  className="w-[300px] border-[2px] border-[#002C4E] bg-white text-[#002C4E] text-[19px] font-semibold py-5 px-3 rounded-lg transition duration-300 ease-in-out hover:shadow-lg hover:scale-105">
+    <div className="mt-auto flex items-center justify-between w-[75%]">
+    
+    {/* Lien Back to Login */}
+    <button
+      onClick={() => navigate("/")}
+      className="text-[#002C4E] text-[20px] font-medium transition duration-300 ease-in-out hover:underline   hover:text-white"
+    >
+      Back to Login
+    </button>
+
+    {/* Bouton Send Email */}
+    <button
+      disabled={!isValid}
+      onClick={() => navigate("/code")}
+      className={`w-[300px] border-[2px] border-[#002C4E] bg-white text-[#002C4E] text-[19px] font-semibold py-5 px-3 rounded-lg transition duration-300 ease-in-out hover:shadow-lg hover:scale-105 `}
+    >
       Send Email
     </button>
   </div>
