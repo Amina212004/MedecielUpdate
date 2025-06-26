@@ -18,14 +18,38 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'password']
+        fields = ['email', 'password', 'first_name', 'last_name', 'role']
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
+    def validate_first_name(self, value):
+        if not value.isalpha():
+            raise serializers.ValidationError("First name must contain only letters")
+        return value
+
+    def validate_last_name(self, value):
+        if not value.isalpha():
+            raise serializers.ValidationError("Last name must contain only letters")
+        return value
+
+    def validate_email(self, value):
+        if not bool(r'^[a-z]{1,3}\.[a-z]+@esi-sba\.dz$'.match(value)):
+            raise serializers.ValidationError("Email must be in the format abc.prenom@esi-sba.dz")
+        return value
+
+    def validate_role(self, value):
+        valid_roles = ['Student', 'Teacher', 'ATS']
+        if value not in valid_roles:
+            raise serializers.ValidationError("Role must be one of: Student, Teacher, ATS")
+        return value
+
     def create(self, validated_data):
         user = User.objects.create_user(
             email=validated_data['email'],
-            password=validated_data['password']
+            password=validated_data['password'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            role=validated_data['role']
         )
         return user
