@@ -38,10 +38,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "core",
+    'rest_framework',
+    'corsheaders',
+    'accounts',
     
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -50,6 +55,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
 
 ROOT_URLCONF = "clinic.urls"
 
@@ -135,3 +141,18 @@ EMAIL_HOST_PASSWORD = 'q6zrmp2c5tmysipugt25a5xfhrgavoza'
 DEFAULT_FROM_EMAIL = 'medeciels@gmail.com'
 SERVER_EMAIL = 'medeciels@gmail.com'
 
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
