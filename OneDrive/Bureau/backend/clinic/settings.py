@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "core",
     "rest_framework",
+    'rest_framework.authtoken',
     "corsheaders",
     "accounts",
+   
 ]
 
 MIDDLEWARE = [
@@ -146,12 +148,12 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
     ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
-    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ]
 }
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 AUTH_USER_MODEL = 'accounts.CustomUser'

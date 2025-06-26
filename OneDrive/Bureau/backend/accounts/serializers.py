@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
+import re
 
 User = get_user_model()
 
@@ -34,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_email(self, value):
-        if not bool(r'^[a-z]{1,3}\.[a-z]+@esi-sba\.dz$'.match(value)):
+        if not bool(re.match(r'^[a-z]{1,3}\.[a-z]+@esi-sba\.dz$', value)):
             raise serializers.ValidationError("Email must be in the format abc.prenom@esi-sba.dz")
         return value
 
@@ -53,3 +54,36 @@ class UserSerializer(serializers.ModelSerializer):
             role=validated_data['role']
         )
         return user
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.CharField(
+        validators=[
+            RegexValidator(
+                regex=r'^[a-z]{1,3}\.[a-z]+@esi-sba\.dz$',
+                message='Email must follow the format: abc.prenom@esi-sba.dz (abc = 1-3 letters)'
+            )
+        ]
+    )
+
+class VerifyCodeSerializer(serializers.Serializer):
+    email = serializers.CharField(
+        validators=[
+            RegexValidator(
+                regex=r'^[a-z]{1,3}\.[a-z]+@esi-sba\.dz$',
+                message='Email must follow the format: abc.prenom@esi-sba.dz (abc = 1-3 letters)'
+            )
+        ]
+    )
+    code = serializers.CharField(max_length=6, min_length=6)
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.CharField(
+        validators=[
+            RegexValidator(
+                regex=r'^[a-z]{1,3}\.[a-z]+@esi-sba\.dz$',
+                message='Email must follow the format: abc.prenom@esi-sba.dz (abc = 1-3 letters)'
+            )
+        ]
+    )
+    code = serializers.CharField(max_length=6, min_length=6)
+    new_password = serializers.CharField(min_length=8, write_only=True)
