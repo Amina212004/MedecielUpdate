@@ -39,10 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "core",
     "rest_framework",
-    'rest_framework.authtoken',
+    "rest_framework.authtoken",
     "corsheaders",
     "accounts",
-   
 ]
 
 MIDDLEWARE = [
@@ -133,14 +132,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "medeciels@gmail.com"
-EMAIL_HOST_PASSWORD = "q6zrmp2c5tmysipugt25a5xfhrgavoza"
-DEFAULT_FROM_EMAIL = "medeciels@gmail.com"
-SERVER_EMAIL = "medeciels@gmail.com"
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -148,12 +139,21 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ]
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
 }
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-AUTH_USER_MODEL = 'accounts.CustomUser'
+
+AUTH_USER_MODEL = "accounts.CustomUser"
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "medeciels@gmail.com"
+EMAIL_HOST_PASSWORD = "rbewnbcetsgufjpt"  
+DEFAULT_FROM_EMAIL = "medeciels@gmail.com"
