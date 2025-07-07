@@ -7,6 +7,7 @@ import Code from './components/Code'
 import AdminSidbare from './components/AdminSideBare'
 import Header from "./components/Header.jsx";
 import ADDUser from "./components/ADDUser.jsx";
+import ValidatePage from "./components/ValidatePage.jsx";
 
 
 function App() {
@@ -14,17 +15,17 @@ function App() {
 
   return (
     <>
-     <ADDUser/>
-     
-   {/*
+    
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgotpassword" element={<ForgotPassword/>} />
         <Route path="/code" element={<Code/>} />
         <Route path="/reset" element={<Reset/>} />
-      </Routes>
-    */ }
+        <Route path='/adduser' element={<ADDUser/>} />
+        <Route path='/validatepage' element={<ValidatePage/>} />
+      </Routes> 
+    
     </>
   )
 }
