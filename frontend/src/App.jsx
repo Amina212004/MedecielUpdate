@@ -4,13 +4,19 @@ import Reset from "./components/Reset"
 import SignUp from "./components/SignUp"
 import ForgotPassword from './components/ForgotPassword'
 import Code from './components/Code'
+import AdminSidbare from './components/AdminSideBare'
+import Header from "./components/Header.jsx";
+import ADDUser from "./components/ADDUser.jsx";
 
 
 function App() {
  
 
   return (
-   <Router>
+    <>
+     <ADDUser/>
+     
+   {/*
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
@@ -18,7 +24,8 @@ function App() {
         <Route path="/code" element={<Code/>} />
         <Route path="/reset" element={<Reset/>} />
       </Routes>
-    </Router>
+    */ }
+    </>
   )
 }
 
