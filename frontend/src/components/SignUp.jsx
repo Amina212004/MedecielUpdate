@@ -44,13 +44,42 @@ const SignUp = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validate()) {
-      alert("Account created successfully!");
-      // Tu peux ici envoyer les données au backend
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (validate()) {
+    try {
+      const response = await fetch("http://localhost:8000/api/signup/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          password: password,
+          role: role,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Erreur :", errorData);
+        alert("Erreur lors de l'envoi de la demande !");
+        return;
+      }
+
+      alert("Demande envoyée avec succès ! En attente de validation par l'admin.");
+      navigate("/");
+    } catch (error) {
+      console.error("Erreur réseau :", error);
+      alert("Erreur de connexion au serveur.");
     }
-  };
+  }
+};
+
+
+
   return (
     <div
       className="min-h-screen w-full flex bg-cover bg-center"

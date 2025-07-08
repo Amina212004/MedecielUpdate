@@ -15,31 +15,57 @@ const LoginPage = () => {
     return regex.test(email);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    let valid = true;
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  let valid = true;
 
-    // Validation Email
-    if (!validateEmail(email)) {
-      setEmailError("Format requis : abc.prenom@esi-sba.dz (abc = 1 à 3 lettres)");
-      valid = false;
-    } else {
-      setEmailError("");
-    }
+  // Validation de l'email
+  if (!validateEmail(email)) {
+    setEmailError("Format requis : abc.prenom@esi-sba.dz (abc = 1 à 3 lettres)");
+    valid = false;
+  } else {
+    setEmailError("");
+  }
 
-    // Validation Mot de passe
-    if (password.length < 8) {
-      setPasswordError("Le mot de passe doit contenir au moins 8 caractères");
-      valid = false;
-    } else {
-      setPasswordError("");
-    }
+  // Validation du mot de passe
+  if (password.length < 8) {
+    setPasswordError("Le mot de passe doit contenir au moins 8 caractères");
+    valid = false;
+  } else {
+    setPasswordError("");
+  }
 
-    if (valid) {
-      // Ici, tu peux faire un appel à ton backend
-      alert("Connexion réussie !");
+  if (valid) {
+    try {
+      const response = await fetch("http://localhost:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Email ou mot de passe incorrect");
+      }
+
+      const data = await response.json();
+
+      // Enregistrer le token (ou autre info renvoyée par l'API)
+      localStorage.setItem("token", data.token);  // change 'token' selon ta réponse backend
+
+      // Rediriger vers une page protégée après login
+      navigate("/ADDUser");
+    } catch (error) {
+      console.error("Erreur lors de la connexion :", error);
+      alert("Échec de la connexion. Vérifie tes identifiants.");
     }
-  };
+  }
+};
+
   return (
     <div
       className="min-h-screen w-full flex bg-cover bg-center"

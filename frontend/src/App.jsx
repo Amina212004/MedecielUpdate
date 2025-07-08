@@ -4,8 +4,7 @@ import Reset from "./components/Reset"
 import SignUp from "./components/SignUp"
 import ForgotPassword from './components/ForgotPassword'
 import Code from './components/Code'
-import AdminSidbare from './components/AdminSideBare'
-import Header from "./components/Header.jsx";
+import AdminHome from './components/AdminHome.jsx'
 import ADDUser from "./components/ADDUser.jsx";
 import ValidatePage from "./components/ValidatePage.jsx";
 
@@ -24,6 +23,7 @@ function App() {
         <Route path="/reset" element={<Reset/>} />
         <Route path='/adduser' element={<ADDUser/>} />
         <Route path='/validatepage' element={<ValidatePage/>} />
+        <Route path='/adminhome' element={<AdminHome/>} />
       </Routes> 
     
     </>

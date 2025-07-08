@@ -44,10 +44,10 @@ const ValidatePage = () => {
                  border: "2px solid #002C4E",
                  
           }}>
-            <th className="py-3 px-4 text-left ont-semibold text-[20px] h-[20px]">First Name</th>
-            <th className="py-3 px-4 text-left ont-semibold text-[20px]">Last Name</th>
-            <th className="py-3 px-4 text-left ont-semibold text-[20px]">Email</th>
-            <th className="py-3 px-4 text-left ont-semibold text-[20px]">Role</th>
+            <th className="py-3 px-4 text-left font-semibold text-[20px] h-[20px]">First Name</th>
+            <th className="py-3 px-4 text-left font-semibold text-[20px]">Last Name</th>
+            <th className="py-3 px-4 text-left font-semibold text-[20px]">Email</th>
+            <th className="py-3 px-4 text-left font-semibold text-[20px]">Role</th>
             <th className="py-3 px-4 text-center ont-semibold text-[20px]">Actions</th>
           </tr>
         </thead>
