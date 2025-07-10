@@ -2,15 +2,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token  
-from .serializers import LoginSerializer, UserSerializer, PasswordResetRequestSerializer, VerifyCodeSerializer, PasswordResetSerializer
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAdminUser
 from django.core.mail import send_mail
 from django.utils import timezone
 from datetime import timedelta
 import random
 import string
 from .models import CustomUser
-from rest_framework.permissions import IsAdminUser
+from .serializers import LoginSerializer, UserSerializer, PasswordResetRequestSerializer, VerifyCodeSerializer, PasswordResetSerializer
 
 class LoginView(APIView):
     def post(self, request):
@@ -40,11 +40,10 @@ class LoginView(APIView):
 
 class SignupView(APIView):
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.save()
-            
-            admin_email = 'admin@esi-sba.dz' 
+            admin_email = 'admin@esi-sba.dz'
             send_mail(
                 subject='New User Registration Request',
                 message=f'A new user has registered:\n\n'
@@ -58,6 +57,26 @@ class SignupView(APIView):
             )
             return Response({
                 'message': 'User registered successfully. Awaiting admin verification.'
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminAddUserView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        serializer = UserSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.validated_data['is_verified'] = True
+            user = serializer.save()
+            return Response({
+                'message': f'User {user.email} added successfully.',
+                'user': {
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'role': user.role,
+                    'is_verified': user.is_verified
+                }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -142,26 +161,23 @@ class PasswordResetView(APIView):
                     'error': 'No user found with this email'
                 }, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 class UserVerificationView(APIView):
-    permission_classes = [IsAdminUser]  
+    permission_classes = [IsAdminUser]
 
     def get(self, request):
-      
         users = CustomUser.objects.filter(is_verified=False)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         user_id = request.data.get('user_id')
-        action = request.data.get('action')  
+        action = request.data.get('action')
         try:
             user = CustomUser.objects.get(id=user_id)
             if action == 'accept':
                 user.is_verified = True
                 user.save()
-                
                 send_mail(
                     subject='Account Verified',
                     message=f'Your account ({user.email}) has been verified. You can now log in.',

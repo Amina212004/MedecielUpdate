@@ -20,7 +20,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(
-        self, email, password, first_name, last_name, role, **extra_fields
+        self, email, password, first_name, last_name, role="Admin", **extra_fields
     ):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
@@ -46,6 +46,9 @@ class CustomUser(AbstractUser):
             ("Teacher", "Teacher"),
             ("ATS", "ATS"),
             ("Admin", "Admin"),
+            ("Director", "Director"),
+            ("Medecin", "Medecin"),
+            ("Assistant", "Assistant"),
         ],
     )
     reset_code = models.CharField(max_length=6, blank=True, null=True)
