@@ -28,25 +28,48 @@ class LoginView(APIView):
             email = serializer.validated_data["email"]
             password = serializer.validated_data["password"]
             user = authenticate(email=email, password=password)
+
             if user:
+
+                if user.email == "medeciels@gmail.com":
+                    token, created = Token.objects.get_or_create(user=user)
+                    return Response(
+                        {
+                            "token": token.key,
+                            "message": "Admin login successful",
+                            "role": user.role,
+                            "redirect": "adminhome",
+                        },
+                        status=status.HTTP_200_OK,
+                    )
+
                 if not user.is_verified:
                     return Response(
                         {"error": "Your account is awaiting admin verification."},
                         status=status.HTTP_403_FORBIDDEN,
                     )
+
                 if not user.is_active:
                     return Response(
                         {"error": "Your account is deactivated."},
                         status=status.HTTP_403_FORBIDDEN,
                     )
+
                 token, created = Token.objects.get_or_create(user=user)
                 return Response(
-                    {"token": token.key, "message": "Login successful"},
+                    {
+                        "token": token.key,
+                        "message": "Login successful",
+                        "role": user.role,
+                        "redirect": "home",
+                    },
                     status=status.HTTP_200_OK,
                 )
+
             return Response(
                 {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
