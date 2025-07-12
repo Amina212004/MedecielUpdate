@@ -17,13 +17,22 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
 class UserSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    img = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["id", "email", "password", "first_name", "last_name", "role", "is_verified"]
+        fields = ["id", "email", "password", "first_name", "last_name", "name", "role", "is_verified", "img"]
         extra_kwargs = {
             "password": {"write_only": True},
             "is_verified": {"read_only": True},
         }
+
+    def get_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+    def get_img(self, obj):
+        return obj.img if obj.img else f"https://randomuser.me/api/portraits/{'men' if obj.id % 2 else 'women'}/{obj.id % 100}.jpg"
 
     def validate_first_name(self, value):
         if not value.isalpha():

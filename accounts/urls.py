@@ -5,6 +5,7 @@ from .views import (
     LoginView,
     PasswordResetRequestView,
     PasswordResetView,
+    RecentUsersView,
     SignupView,
     UserVerificationView,
     VerifyCodeView,
@@ -24,4 +25,5 @@ urlpatterns = [
     path("verify-code/", VerifyCodeView.as_view(), name="verify_code"),
     path("password-reset/", PasswordResetView.as_view(), name="password_reset"),
     path("verify-user/", UserVerificationView.as_view(), name="verify_user"),
+    path("recent-users/", RecentUsersView.as_view(), name="recent-users"),
 ]
