@@ -1,11 +1,9 @@
 import re
-
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from rest_framework import serializers
 
 User = get_user_model()
-
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(
@@ -18,11 +16,10 @@ class LoginSerializer(serializers.Serializer):
     )
     password = serializers.CharField(write_only=True)
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["email", "password", "first_name", "last_name", "role", "is_verified"]
+        fields = ["id", "email", "password", "first_name", "last_name", "role", "is_verified"]
         extra_kwargs = {
             "password": {"write_only": True},
             "is_verified": {"read_only": True},
@@ -46,7 +43,6 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_role(self, value):
-
         if (
             self.context.get("request")
             and self.context["request"].method == "POST"
@@ -70,7 +66,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.CharField(
         validators=[
@@ -80,7 +75,6 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             )
         ]
     )
-
 
 class VerifyCodeSerializer(serializers.Serializer):
     email = serializers.CharField(
@@ -92,7 +86,6 @@ class VerifyCodeSerializer(serializers.Serializer):
         ]
     )
     code = serializers.CharField(max_length=6, min_length=6)
-
 
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.CharField(
