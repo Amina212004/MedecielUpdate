@@ -73,15 +73,15 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_role(self, value):
+        valid_roles = [choice[0] for choice in User.role.field.choices]
         if (
             self.context.get("request")
             and self.context["request"].method == "POST"
             and "signup" in self.context["request"].path
         ):
-            valid_roles = ["Student", "Teacher", "ATS"]
             if value not in valid_roles:
                 raise serializers.ValidationError(
-                    "Role must be one of: Student, Teacher, ATS"
+                    f"Role must be one of: {', '.join(valid_roles)}"
                 )
         return value
 
