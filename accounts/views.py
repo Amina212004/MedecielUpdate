@@ -1,7 +1,7 @@
 import random
 import string
 from datetime import timedelta
-
+from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -10,6 +10,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.utils import timezone
+from datetime import timedelta
 
 from .models import CustomUser
 from .serializers import (
@@ -117,8 +119,8 @@ class AdminAddUserView(APIView):
                         "last_name": user.last_name,
                         "role": user.role,
                         "is_verified": user.is_verified,
-                        "img": user.img
-                        or f"https://randomuser.me/api/portraits/{'men' if user.id % 2 else 'women'}/{user.id % 100}.jpg",
+                        "img": user.img,  # Return null if no img
+                        "initials": f"{user.first_name[0]}{user.last_name[0]}".upper() if user.first_name and user.last_name else ""  # Add initials
                     },
                 },
                 status=status.HTTP_201_CREATED,
@@ -229,46 +231,106 @@ class UserVerificationView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        user_id = request.data.get("user_id")
-        action = request.data.get("action")
+        user_id = request.data.get('user_id')
+        action = request.data.get('action')
+
+        if not user_id or not action:
+            return Response(
+                {"error": "user_id and action are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
-            user = CustomUser.objects.get(id=user_id)
-            if action == "accept":
-                user.is_verified = True
-                user.save()
-                send_mail(
-                    subject="Account Verified",
-                    message=f"Your account ({user.email}) has been verified. You can now log in.",
-                    from_email="medeciels@gmail.com",
-                    recipient_list=[user.email],
-                    fail_silently=False,
-                )
-                return Response(
-                    {"message": f"User {user.email} verified successfully"},
-                    status=status.HTTP_200_OK,
-                )
-            elif action == "delete":
-                user.delete()
-                return Response(
-                    {"message": f"User {user.email} deleted successfully"},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(
-                    {"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST
-                )
+            user = CustomUser.objects.get(id=user_id, is_verified=False)
         except CustomUser.DoesNotExist:
             return Response(
-                {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
+                {"error": "User not found or already verified"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if action == 'accept':
+            user.is_verified = True
+            user.save()
+            return Response(
+                {"message": f"User {user.email} verified successfully"},
+                status=status.HTTP_200_OK
+            )
+        elif action == 'delete':
+            user.delete()
+            return Response(
+                {"message": f"User {user.email} deleted successfully"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {"error": "Invalid action. Use 'accept' or 'delete'"},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
 
-class RecentUsersView(APIView):
+
+
+
+
+class AdminUsersView(APIView):
     permission_classes = [IsAdminUser]
+    def get(self, request):
+        days = int(request.query_params.get('days', 7))
+        role = request.query_params.get('role', None)
+        if role and role not in ['Medecin', 'Assistant', 'Director']:
+            return Response(
+                {"error": "Invalid role. Use 'Medecin', 'Assistant', or 'Director'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        cutoff_date = timezone.now() - timedelta(days=days)
+        query = CustomUser.objects.filter(
+            created_by_admin=True,
+            date_joined__gte=cutoff_date
+        )
+        if role:
+            query = query.filter(role=role)
+        users = query.order_by('-date_joined')[:10]
+        serializer = UserSerializer(users, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class PatientListView(APIView):
+    permission_classes = [IsAdminUser]
+    pagination_class = PageNumberPagination
 
     def get(self, request):
-        users = CustomUser.objects.filter(created_by_admin=True).order_by(
-            "-date_joined"
-        )[:4]
-        serializer = UserSerializer(users, many=True)
+        patients = CustomUser.objects.filter(
+            role__in=["Student", "Teacher", "ATS"],
+            is_verified=True
+        ).order_by('-date_joined')
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(patients, request)
+        serializer = UserSerializer(page, many=True, context={"request": request})
+        return paginator.get_paginated_response(serializer.data)
+    
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class MedicalStaffView(APIView):
+    permission_classes = [IsAdminUser]
+    pagination_class = PageNumberPagination
+    def get(self, request):
+        role = request.query_params.get('role', None)
+        if role and role not in ['Medecin', 'Assistant']:
+            return Response(
+                {"error": "Invalid role. Use 'Medecin' or 'Assistant'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        staff = CustomUser.objects.filter(
+            role__in=["Medecin", "Assistant"] if not role else [role],
+            is_verified=True
+        ).order_by('-date_joined')
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(staff, request)
+        serializer = UserSerializer(page, many=True, context={"request": request})
+        return paginator.get_paginated_response(serializer.data)

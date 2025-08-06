@@ -21,9 +21,17 @@ class LoginSerializer(serializers.Serializer):
         return value
 
 
+import re
+from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
+from rest_framework import serializers
+
+User = get_user_model()
+
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     img = serializers.SerializerMethodField()
+    initials = serializers.SerializerMethodField()  # New field for initials
 
     class Meta:
         model = User
@@ -36,22 +44,25 @@ class UserSerializer(serializers.ModelSerializer):
             "name",
             "role",
             "is_verified",
+            "created_by_admin",
             "img",
+            "initials",  # Add initials to the serialized fields
         ]
         extra_kwargs = {
             "password": {"write_only": True},
-            "is_verified": {"read_only": True},
+            "is_verified": {"read_only": False},
+            "created_by_admin": {"read_only": False},
         }
 
     def get_name(self, obj):
         return f"{obj.first_name} {obj.last_name}"
 
     def get_img(self, obj):
-        return (
-            obj.img
-            if obj.img
-            else f"https://randomuser.me/api/portraits/{'men' if obj.id % 2 else 'women'}/{obj.id % 100}.jpg"
-        )
+        return obj.img if obj.img else None  # Return null if no profile picture
+
+    def get_initials(self, obj):
+        # Return first letter of first_name and last_name (e.g., "AB" for Amina Bezzodji)
+        return f"{obj.first_name[0]}{obj.last_name[0]}".upper() if obj.first_name and obj.last_name else ""
 
     def validate_first_name(self, value):
         if not value.isalpha():
@@ -64,36 +75,33 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_email(self, value):
-        admin_email = "medeciels@gmail.com"
-        if value != admin_email:
-            if not bool(re.match(r"^[a-z]{1,3}\.[a-z]+@esi-sba\.dz$", value)):
-                raise serializers.ValidationError(
-                    "Email must be in the format abc.prenom@esi-sba.dz"
-                )
+        if not bool(re.match(r"^[a-z]{1,3}\.[a-z]+@esi-sba\.dz$", value)):
+            raise serializers.ValidationError(
+                "Email must be in the format abc.prenom@esi-sba.dz"
+            )
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
         return value
 
     def validate_role(self, value):
         valid_roles = [choice[0] for choice in User.role.field.choices]
-        if (
-            self.context.get("request")
-            and self.context["request"].method == "POST"
-            and "signup" in self.context["request"].path
-        ):
-            if value not in valid_roles:
-                raise serializers.ValidationError(
-                    f"Role must be one of: {', '.join(valid_roles)}"
-                )
+        if value not in valid_roles:
+            raise serializers.ValidationError(
+                f"Role must be one of: {', '.join(valid_roles)}"
+            )
         return value
 
     def create(self, validated_data):
-        user = User.objects.create_user(
+        user = User(
             email=validated_data["email"],
-            password=validated_data["password"],
             first_name=validated_data["first_name"],
             last_name=validated_data["last_name"],
             role=validated_data["role"],
-            is_verified=False,
+            is_verified=validated_data.get("is_verified", False),
+            created_by_admin=validated_data.get("created_by_admin", False),
         )
+        user.set_password(validated_data["password"])
+        user.save()
         return user
 
 

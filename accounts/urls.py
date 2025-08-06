@@ -2,10 +2,13 @@ from django.urls import path
 
 from .views import (
     AdminAddUserView,
+    AdminUsersView,
+    CurrentUserView,
     LoginView,
+    MedicalStaffView,
     PasswordResetRequestView,
     PasswordResetView,
-    RecentUsersView,
+    PatientListView,
     SignupView,
     UserVerificationView,
     VerifyCodeView,
@@ -25,5 +28,8 @@ urlpatterns = [
     path("verify-code/", VerifyCodeView.as_view(), name="verify_code"),
     path("password-reset/", PasswordResetView.as_view(), name="password_reset"),
     path("verify-user/", UserVerificationView.as_view(), name="verify_user"),
-    path("recent-users/", RecentUsersView.as_view(), name="recent-users"),
+    path("recent-users/", AdminUsersView.as_view(), name="recent-users"),
+    path("patients/", PatientListView.as_view(), name="patient-list"),
+    path("current-user/", CurrentUserView.as_view(), name="current-user"),
+    path("medical-staff/", MedicalStaffView.as_view(), name="medical-staff"),
 ]
