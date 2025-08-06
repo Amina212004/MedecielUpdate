@@ -1,4 +1,4 @@
-import { FaHome, FaUserMd, FaUserPlus, FaUser } from "react-icons/fa";
+import { FaHome, FaUser, FaUserMd, FaUserPlus } from "react-icons/fa";
 import { MdOutlineMedicalServices } from "react-icons/md";
 import { RiInbox2Fill, RiLogoutCircleLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
@@ -34,7 +34,7 @@ const AdminSideBare = () => {
           </Link>
 
           <Link
-            to="#"
+            to="/medicalstaffs"
             className="flex items-center gap-3 hover:text-gray-200 font-semibold"
           >
             <MdOutlineMedicalServices className="text-[#BBFAF4]" /> MedicalStaff
