@@ -334,3 +334,28 @@ class MedicalStaffView(APIView):
         page = paginator.paginate_queryset(staff, request)
         serializer = UserSerializer(page, many=True, context={"request": request})
         return paginator.get_paginated_response(serializer.data)
+    
+class ProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        serializer = UserSerializer(user, data=request.data, partial=True, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": "Profile updated successfully",
+                    "user": {
+                        "email": user.email,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "role": user.role,
+                        "is_verified": user.is_verified,
+                        "img": user.img,
+                        "initials": f"{user.first_name[0]}{user.last_name[0]}".upper() if user.first_name and user.last_name else ""
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

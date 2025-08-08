@@ -21,13 +21,6 @@ class LoginSerializer(serializers.Serializer):
         return value
 
 
-import re
-from django.contrib.auth import get_user_model
-from django.core.validators import RegexValidator
-from rest_framework import serializers
-
-User = get_user_model()
-
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     img = serializers.SerializerMethodField()
@@ -46,23 +39,28 @@ class UserSerializer(serializers.ModelSerializer):
             "is_verified",
             "created_by_admin",
             "img",
-            "initials",  # Add initials to the serialized fields
+            "initials",
         ]
         extra_kwargs = {
             "password": {"write_only": True},
             "is_verified": {"read_only": False},
             "created_by_admin": {"read_only": False},
+            "email": {"read_only": True},
         }
 
     def get_name(self, obj):
         return f"{obj.first_name} {obj.last_name}"
 
     def get_img(self, obj):
-        return obj.img if obj.img else None  # Return null if no profile picture
+        return obj.img if obj.img else None
 
     def get_initials(self, obj):
-        # Return first letter of first_name and last_name (e.g., "AB" for Amina Bezzodji)
-        return f"{obj.first_name[0]}{obj.last_name[0]}".upper() if obj.first_name and obj.last_name else ""
+
+        return (
+            f"{obj.first_name[0]}{obj.last_name[0]}".upper()
+            if obj.first_name and obj.last_name
+            else ""
+        )
 
     def validate_first_name(self, value):
         if not value.isalpha():

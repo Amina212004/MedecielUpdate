@@ -12,6 +12,7 @@ from .views import (
     SignupView,
     UserVerificationView,
     VerifyCodeView,
+    ProfileUpdateView
 )
 
 app_name = "accounts"
@@ -32,4 +33,5 @@ urlpatterns = [
     path("patients/", PatientListView.as_view(), name="patient-list"),
     path("current-user/", CurrentUserView.as_view(), name="current-user"),
     path("medical-staff/", MedicalStaffView.as_view(), name="medical-staff"),
+    path('profile/update/', ProfileUpdateView.as_view(), name='profile-update'),
 ]
