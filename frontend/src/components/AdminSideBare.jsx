@@ -58,7 +58,7 @@ const AdminSideBare = () => {
           </Link>
 
           <Link
-            to="#"
+            to="/profile"
             className="flex items-center gap-3 hover:text-gray-200 font-semibold"
           >
             <FaUser className="text-[#BBFAF4]" /> Profile

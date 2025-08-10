@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/LOgo.svg";
 import backgroundImage from '../assets/login.svg';
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -64,7 +65,7 @@ const LoginPage = () => {
         if (data.redirect === "adminhome") {
           navigate("/adminhome");
         } else {
-          navigate("/home");
+          navigate("/profile");
         }
       } catch (error) {
         console.error("Erreur lors de la connexion:", error.message);
@@ -135,12 +136,12 @@ const LoginPage = () => {
           </div>
           <p className="mt-12 text-center text-gray-700 text-[19px] font-semibold">
             Don’t have an account?{" "}
-            <button
-              className="text-teal-500 font-semibold hover:underline"
-              onClick={() => navigate("/signup")}
-            >
+           <Link
+            to="/signup"
+            className="text-teal-500 font-semibold hover:underline"
+           >
               Sign up
-            </button>
+         </Link>
           </p>
         </form>
       </div>

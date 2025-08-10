@@ -8,6 +8,7 @@ import MedicalStaffs from "./components/MedicalStaffs.jsx";
 import Reset from "./components/Reset";
 import SignUp from "./components/SignUp";
 import ValidatePage from "./components/ValidatePage.jsx";
+import Profile from "./components/Profile.jsx";
 
 
 function App() {
@@ -26,6 +27,9 @@ function App() {
         <Route path='/validatepage' element={<ValidatePage/>} />
         <Route path='/adminhome' element={<AdminHome/>} />
         <Route path='/medicalstaffs' element={<MedicalStaffs/>} />
+        <Route path='/profile' element={<Profile/>} />
+        
+
       </Routes> 
     
     </>
