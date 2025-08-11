@@ -3,7 +3,7 @@ import re
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from rest_framework import serializers
-
+from .models import CustomUser
 User = get_user_model()
 
 
@@ -23,11 +23,11 @@ class LoginSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
-    img = serializers.SerializerMethodField()
-    initials = serializers.SerializerMethodField()  # New field for initials
+    img = serializers.ImageField(allow_null=True, required=False)
+    initials = serializers.SerializerMethodField()  
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = [
             "id",
             "email",
@@ -45,7 +45,6 @@ class UserSerializer(serializers.ModelSerializer):
             "password": {"write_only": True},
             "is_verified": {"read_only": False},
             "created_by_admin": {"read_only": False},
-            "email": {"read_only": True},
         }
 
     def get_name(self, obj):

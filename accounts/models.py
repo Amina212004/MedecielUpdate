@@ -49,7 +49,7 @@ class CustomUser(AbstractUser):
     reset_code_expiry = models.DateTimeField(blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    img = models.URLField(max_length=200, blank=True, null=True)
+    img = models.ImageField(upload_to="profile_images/", blank=True, null=True)
     created_by_admin = models.BooleanField(default=False)  
 
     username = None
