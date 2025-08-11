@@ -1,0 +1,50 @@
+
+
+.badge-role-Medecin {
+    background-color: #4e73df;
+    color: white;
+}
+
+.badge-role-Assistant {
+    background-color: #1cc88a;
+    color: white;
+}
+
+.badge-role-ATS {
+    background-color: #36b9cc;
+    color: white;
+}
+
+.badge-role-Teacher {
+    background-color: #f6c23e;
+    color: white;
+}
+
+.badge-role-Student {
+    background-color: #e74a3b;
+    color: white;
+}
+
+.badge-role-Director {
+    background-color: #5a5c69;
+    color: white;
+}
+
+.badge-role-Admin {
+    background-color: #858796;
+    color: white;
+}
+
+/* Custom card styling for user details */
+.card-user-details {
+    border-left: 4px solid #4e73df;
+}
+
+/* Custom avatar styling */
+.avatar-lg {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #dddfeb;
+}
