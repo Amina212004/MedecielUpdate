@@ -27,7 +27,7 @@ const AdminSideBare = () => {
           </Link>
 
           <Link
-            to="#"
+            to="/patientlist"
             className="flex items-center gap-3 hover:text-gray-200 font-semibold"
           >
             <FaUserMd className="text-[#BBFAF4]" /> Patients

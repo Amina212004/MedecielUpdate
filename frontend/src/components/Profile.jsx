@@ -164,7 +164,7 @@ const Profile = () => {
           initials={user.initials}
         />
         <div
-          className="flex-1 flex ml-[320px] mt-[160px] mr-[60px] mb-[30px] border"
+          className="flex-1 flex ml-[320px] mt-[160px] mr-[60px] mb-[30px] border "
           style={{
             width: "calc(100vw - 320px - 60px)",
             height: "calc(100vh - 160px - 30px)",
@@ -177,20 +177,20 @@ const Profile = () => {
           <div className="p-6 flex flex-col justify-center w-full h-full">
             {success && <p className="text-green-600 text-lg mb-4">{success}</p>}
             {error && <p className="text-red-600 text-lg mb-4">{error}</p>}
-            <div className="mb-8 flex items-start gap-6">
+            <div className=" flex items-start gap-6 ">
               <div className="flex flex-col items-start">
                 {imagePreview || user.img ? (
                   <img
                     src={imagePreview || user.img} // Use preview if available
                     alt="User"
-                    className="w-64 h-64 rounded-full border-4 border-teal-400 object-cover"
+                    className="w-56 h-56 rounded-full border-4 border-teal-400 object-cover"
                     onError={(e) => {
                       console.error("Failed to load image:", imagePreview || user.img);
                       e.target.style.display = 'none';
                     }}
                   />
                 ) : (
-                  <div className="w-64 h-64 rounded-full bg-teal-500 text-white flex items-center justify-center text-5xl font-semibold border-4 border-teal-400">
+                  <div className="w-56 h-56 rounded-full bg-teal-500 text-white flex items-center justify-center text-5xl font-semibold border-4 border-teal-400">
                     {user.first_name?.charAt(0).toUpperCase()}
                     {user.last_name?.charAt(0).toUpperCase()}
                   </div>

@@ -9,6 +9,7 @@ import Reset from "./components/Reset";
 import SignUp from "./components/SignUp";
 import ValidatePage from "./components/ValidatePage.jsx";
 import Profile from "./components/Profile.jsx";
+import PatientList from "./components/PatientList.jsx";
 
 
 function App() {
@@ -28,7 +29,7 @@ function App() {
         <Route path='/adminhome' element={<AdminHome/>} />
         <Route path='/medicalstaffs' element={<MedicalStaffs/>} />
         <Route path='/profile' element={<Profile/>} />
-        
+        <Route path='/patientlist' element={<PatientList/>} />
 
       </Routes> 
     
