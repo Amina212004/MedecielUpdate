@@ -294,12 +294,7 @@ class PatientListView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
 
-class CurrentUserView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        serializer = UserSerializer(request.user, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MedicalStaffView(APIView):
@@ -392,3 +387,55 @@ class ChangePasswordView(APIView):
             {"message": "Password updated successfully"},
             status=status.HTTP_200_OK,
         )
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import status
+from .serializers import UserSerializer
+from .models import CustomUser
+from rest_framework.pagination import PageNumberPagination
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class PatientListView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    pagination_class = StandardResultsSetPagination
+
+    def get(self, request):
+        role = request.query_params.get('role', None)
+        patients = CustomUser.objects.all()
+
+        if role and role.lower() != 'all':
+            patients = patients.filter(role=role)
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(patients, request)
+        serializer = UserSerializer(page, many=True, context={"request": request})
+        return paginator.get_paginated_response(serializer.data)
+
+class ToggleAccountStatusView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def patch(self, request, pk):
+        try:
+            user = CustomUser.objects.get(pk=pk)
+            user.is_active = request.data.get('is_active', not user.is_active)
+            user.save()
+            serializer = UserSerializer(user, context={"request": request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

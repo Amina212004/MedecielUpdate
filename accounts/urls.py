@@ -13,7 +13,8 @@ from .views import (
     UserVerificationView,
     VerifyCodeView,
     ProfileUpdateView,
-    ChangePasswordView
+    ChangePasswordView,
+    ToggleAccountStatusView
 )
 
 app_name = "accounts"
@@ -36,4 +37,6 @@ urlpatterns = [
     path("medical-staff/", MedicalStaffView.as_view(), name="medical-staff"),
     path('profile/update/', ProfileUpdateView.as_view(), name='profile-update'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('patients/', PatientListView.as_view(), name='patient-list'),
+    path('patients/<int:pk>/toggle-active/', ToggleAccountStatusView.as_view(), name='toggle-account-status'),
 ]

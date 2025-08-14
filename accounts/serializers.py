@@ -23,6 +23,7 @@ class LoginSerializer(serializers.Serializer):
         return value
 
 
+
 import re
 from rest_framework import serializers
 from .models import CustomUser
@@ -41,6 +42,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "name",
             "role",
+            "is_active",
             "is_verified",
             "created_by_admin",
             "img",
@@ -52,6 +54,7 @@ class UserSerializer(serializers.ModelSerializer):
             "created_by_admin": {"read_only": False},
             "img": {"required": False, "allow_null": True},
             "initials": {"read_only": True},
+            "is_active": {"read_only": False},
         }
 
     def get_name(self, obj):
@@ -100,7 +103,7 @@ class UserSerializer(serializers.ModelSerializer):
             is_verified=validated_data.get("is_verified", False),
             created_by_admin=validated_data.get("created_by_admin", False),
             img=validated_data.get("img", None),
-           
+            is_active=validated_data.get("is_active", True),
         )
         user.set_password(validated_data["password"])
         user.save()
@@ -122,6 +125,7 @@ class UserSerializer(serializers.ModelSerializer):
             representation['img'] = None
 
         return representation
+
 
 
 
