@@ -3,7 +3,9 @@ import re
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from rest_framework import serializers
+
 from .models import CustomUser
+
 User = get_user_model()
 
 
@@ -21,10 +23,13 @@ class LoginSerializer(serializers.Serializer):
         return value
 
 
+import re
+from rest_framework import serializers
+from .models import CustomUser
+
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
-    img = serializers.ImageField(allow_null=True, required=False)
-    initials = serializers.SerializerMethodField()  
+    initials = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -45,16 +50,14 @@ class UserSerializer(serializers.ModelSerializer):
             "password": {"write_only": True},
             "is_verified": {"read_only": False},
             "created_by_admin": {"read_only": False},
+            "img": {"required": False, "allow_null": True},
+            "initials": {"read_only": True},
         }
 
     def get_name(self, obj):
         return f"{obj.first_name} {obj.last_name}"
 
-    def get_img(self, obj):
-        return obj.img if obj.img else None
-
     def get_initials(self, obj):
-
         return (
             f"{obj.first_name[0]}{obj.last_name[0]}".upper()
             if obj.first_name and obj.last_name
@@ -76,12 +79,12 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Email must be in the format abc.prenom@esi-sba.dz"
             )
-        if User.objects.filter(email=value).exists():
+        if CustomUser.objects.filter(email=value).exists():
             raise serializers.ValidationError("This email is already in use.")
         return value
 
     def validate_role(self, value):
-        valid_roles = [choice[0] for choice in User.role.field.choices]
+        valid_roles = [choice[0] for choice in CustomUser.role.field.choices]
         if value not in valid_roles:
             raise serializers.ValidationError(
                 f"Role must be one of: {', '.join(valid_roles)}"
@@ -89,17 +92,39 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        user = User(
+        user = CustomUser(
             email=validated_data["email"],
             first_name=validated_data["first_name"],
             last_name=validated_data["last_name"],
             role=validated_data["role"],
             is_verified=validated_data.get("is_verified", False),
             created_by_admin=validated_data.get("created_by_admin", False),
+            img=validated_data.get("img", None),
+           
         )
         user.set_password(validated_data["password"])
         user.save()
         return user
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get("request")
+
+        try:
+            if instance.img and hasattr(instance.img, 'url'):
+                if request:
+                    representation['img'] = request.build_absolute_uri(instance.img.url)
+                else:
+                    representation['img'] = instance.img.url
+            else:
+                representation['img'] = None
+        except Exception:
+            representation['img'] = None
+
+        return representation
+
+
+
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):

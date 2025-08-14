@@ -112,24 +112,11 @@ class AdminAddUserView(APIView):
             return Response(
                 {
                     "message": f"User {user.email} added successfully.",
-                    "user": {
-                        "email": user.email,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "role": user.role,
-                        "is_verified": user.is_verified,
-                        "img": user.img,  # Return null if no img
-                        "initials": (
-                            f"{user.first_name[0]}{user.last_name[0]}".upper()
-                            if user.first_name and user.last_name
-                            else ""
-                        ),  # Add initials
-                    },
+                    "user": UserSerializer(user, context={"request": request}).data
                 },
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class PasswordResetRequestView(APIView):
     def post(self, request):
