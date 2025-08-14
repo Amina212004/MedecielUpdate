@@ -1,5 +1,6 @@
+
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import doctor from '../assets/Doctore.jpg';
 import Sidebar from './AdminSideBare';
 import Header from './Header';
@@ -12,22 +13,51 @@ const ADDUser = () => {
   const [role, setRole] = useState('');
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
 
   const validateEmail = (value) => {
     const regex = /^[a-zA-Z]{1,3}\.[a-zA-Z]+@esi-sba\.dz$/;
     return regex.test(value);
   };
 
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setErrors({ general: 'Please log in as admin' });
+        return;
+      }
+      const userResponse = await axios.get('http://localhost:8000/api/current-user/', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${token}`,
+        },
+      });
+      setCurrentUser(userResponse.data);
+    } catch (error) {
+      console.error('Error fetching current user:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+      setErrors({ general: 'Failed to fetch current user' });
+    }
+  };
+
   const handleSubmit = async () => {
     const newErrors = {};
 
-    if (!lastName.trim()) newErrors.lastName = "Last Name is required";
-    if (!firstName.trim()) newErrors.firstName = "First Name is required";
-    if (!email.trim()) newErrors.email = "Email is required";
-    else if (!validateEmail(email)) newErrors.email = "Email must be in the form abc.prenom@esi-sba.dz";
-    if (!password) newErrors.password = "Password is required";
-    else if (password.length < 8) newErrors.password = "Password must be at least 8 characters long";
-    if (!role) newErrors.role = "Role is required";
+    if (!lastName.trim()) newErrors.lastName = 'Last Name is required';
+    if (!firstName.trim()) newErrors.firstName = 'First Name is required';
+    if (!email.trim()) newErrors.email = 'Email is required';
+    else if (!validateEmail(email)) newErrors.email = 'Email must be in the form abc.prenom@esi-sba.dz';
+    if (!password) newErrors.password = 'Password is required';
+    else if (password.length < 8) newErrors.password = 'Password must be at least 8 characters long';
+    if (!role) newErrors.role = 'Role is required';
 
     setErrors(newErrors);
 
@@ -58,7 +88,6 @@ const ADDUser = () => {
 
         console.log('Add user response:', response.data);
         setSuccessMessage(`User ${response.data.user.email} added successfully`);
-        // Reset form
         setFirstName('');
         setLastName('');
         setEmail('');
@@ -71,7 +100,6 @@ const ADDUser = () => {
           status: error.response?.status,
           data: error.response?.data,
         });
-        // Display specific backend errors
         const backendErrors = error.response?.data || { general: 'Failed to add user' };
         setErrors(backendErrors);
       }
@@ -80,21 +108,27 @@ const ADDUser = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <Header />
-      <div className="flex flex-1" style={{ width: "100vw", height: "100vh" }}>
+      <Header
+        firstName={currentUser?.first_name}
+        lastName={currentUser?.last_name} // Fixed typo: roofinglastName → lastName
+        role={currentUser?.role}
+        image={currentUser?.img}
+        initials={currentUser?.initials}
+      />
+      <div className="flex flex-1" style={{ width: '100vw', height: '100vh' }}>
         <Sidebar />
         <div
           className="flex-1 flex ml-[320px] mt-[160px] mr-[60px] mb-[30px] border"
           style={{
-            width: "calc(100vw - 320px - 60px)",
-            height: "calc(100vh - 160px - 30px)",
-            border: "3px solid #1B9C92",
-            boxShadow: "0 6px 12px rgba(154, 224, 219, 0.5)",
-            borderRadius: "13px",
-            overflow: "hidden",
+            width: 'calc(100vw - 320px - 60px)',
+            height: 'calc(100vh - 160px - 30px)',
+            border: '3px solid #1B9C92',
+            boxShadow: '0 6px 12px rgba(154, 224, 219, 0.5)',
+            borderRadius: '13px',
+            overflow: 'hidden',
           }}
         >
-          {/* Formulaire */}
+          {/* Form */}
           <div className="flex-[5] h-full p-6 space-y-6">
             {successMessage && (
               <p className="text-green-500 font-semibold text-[18px]">{successMessage}</p>
@@ -120,19 +154,21 @@ const ADDUser = () => {
 
             {/* Last Name */}
             <div>
-              <label className="block mb-2 font-semibold text-[22px] text-[#002C4E]">Last Name</label>
+              <label className="block mb-2 font-semibold text-[22px] text-[#002C4E]">
+                Last Name
+              </label>
               <input
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 className="w-full border rounded p-2"
                 style={{
-                  height: "70px",
+                  height: '70px',
                   outline: 'none',
                   padding: '5px 20px',
-                  border: "3px solid #1B9C92",
-                  borderRadius: "6px",
-                  fontSize: "20px",
+                  border: '3px solid #1B9C92',
+                  borderRadius: '6px',
+                  fontSize: '20px',
                   color: '#002C4E',
                 }}
               />
@@ -141,19 +177,21 @@ const ADDUser = () => {
 
             {/* First Name */}
             <div>
-              <label className="block mb-2 font-semibold text-[22px] text-[#002C4E]">First Name</label>
+              <label className="block mb-2 font-semibold text-[22px] text-[#002C4E]">
+                First Name
+              </label>
               <input
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 className="w-full border rounded p-2"
                 style={{
-                  height: "70px",
+                  height: '70px',
                   outline: 'none',
                   padding: '5px 20px',
-                  border: "3px solid #1B9C92",
-                  borderRadius: "6px",
-                  fontSize: "20px",
+                  border: '3px solid #1B9C92',
+                  borderRadius: '6px',
+                  fontSize: '20px',
                   color: '#002C4E',
                 }}
               />
@@ -162,19 +200,21 @@ const ADDUser = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-[22px] text-[#002C4E] font-semibold mb-2">Email</label>
+              <label className="block text-[22px] text-[#002C4E] font-semibold mb-2">
+                Email
+              </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full border rounded p-2"
                 style={{
-                  height: "70px",
+                  height: '70px',
                   outline: 'none',
                   padding: '5px 20px',
-                  border: "3px solid #1B9C92",
-                  borderRadius: "6px",
-                  fontSize: "20px",
+                  border: '3px solid #1B9C92',
+                  borderRadius: '6px',
+                  fontSize: '20px',
                   color: '#002C4E',
                 }}
               />
@@ -183,19 +223,21 @@ const ADDUser = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-[22px] text-[#002C4E] font-semibold mb-2">Password</label>
+              <label className="block text-[22px] text-[#002C4E] font-semibold mb-2">
+                Password
+              </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full border rounded p-2"
                 style={{
-                  height: "70px",
+                  height: '70px',
                   outline: 'none',
                   padding: '5px 20px',
-                  border: "3px solid #1B9C92",
-                  borderRadius: "6px",
-                  fontSize: "20px",
+                  border: '3px solid #1B9C92',
+                  borderRadius: '6px',
+                  fontSize: '20px',
                   color: '#002C4E',
                 }}
               />
@@ -203,21 +245,21 @@ const ADDUser = () => {
             </div>
 
             {/* Role */}
-          <div>
+            <div>
               <label className="block text-[22px] text-[#002C4E] font-semibold">Role</label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="w-full border rounded p-2"
                 style={{
-                  height: "70px",
-                  outline: "none",
-                  padding: "5px 20px",
-                  border: "3px solid #1B9C92",
-                  borderRadius: "6px",
-                  fontSize: "20px",
-                  color: "#002C4E",
-                  textAlign: "center",
+                  height: '70px',
+                  outline: 'none',
+                  padding: '5px 20px',
+                  border: '3px solid #1B9C92',
+                  borderRadius: '6px',
+                  fontSize: '20px',
+                  color: '#002C4E',
+                  textAlign: 'center',
                 }}
               >
                 <option value="">Select Role</option>
@@ -233,14 +275,14 @@ const ADDUser = () => {
               <button
                 className="mt-4 bg-[#5EA9A9] text-white rounded w-[250px] h-[60px] p-[10px] transition-all duration-300 font-bold text-[20px]"
                 style={{
-                  boxShadow: "0 0 0 rgba(0,0,0,0)",
+                  boxShadow: '0 0 0 rgba(0,0,0,0)',
                   borderRadius: '10px',
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.boxShadow = "0 6px 12px rgba(187, 250, 244, 0.6)";
+                  e.target.style.boxShadow = '0 6px 12px rgba(187, 250, 244, 0.6)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.boxShadow = "0 0 0 rgba(0,0,0,0)";
+                  e.target.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
                 }}
                 onClick={handleSubmit}
               >

@@ -2,15 +2,41 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { FaCheckCircle, FaTrash } from 'react-icons/fa';
 import Header from './Header';
-import Sidebar from './AdminSideBare' 
+import Sidebar from './AdminSideBare';
 
 const ValidatePage = () => {
   const [users, setUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null); 
   const token = localStorage.getItem('token');
 
   useEffect(() => {
     fetchUsers();
+    fetchCurrentUser(); 
   }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      if (!token) {
+        console.error('No token found in localStorage');
+        alert('Please log in as admin');
+        return;
+      }
+      const userResponse = await axios.get('http://localhost:8000/api/current-user/', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${token}`,
+        },
+      });
+      setCurrentUser(userResponse.data);
+    } catch (error) {
+      console.error('Error fetching current user:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+      alert('Failed to fetch current user');
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -85,7 +111,13 @@ const ValidatePage = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <Header />
+      <Header
+        firstName={currentUser?.first_name}
+        lastName={currentUser?.last_name}
+        role={currentUser?.role}
+        image={currentUser?.img}
+        initials={currentUser?.initials}
+      />
       <div className="flex flex-1">
         <Sidebar />
         <div
